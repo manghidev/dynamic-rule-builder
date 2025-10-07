@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate-key="app_title">
+        Dynamic Rule Builder
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .result-badge {
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+
+        .group-controls .add-rule,
+        .group-controls .add-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .group-controls .add-rule svg,
+        .group-controls .add-group svg {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <div class="min-h-screen w-full bg-gradient-to-br from-slate-50 to-slate-200 p-4 sm:p-6 md:p-8">
+
+        <header class="text-center mb-8 fade-in">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900" data-translate-key="main_header">
+                Business Logic Builder
+            </h1>
+            <p class="text-slate-600 mt-2" data-translate-key="main_subheader">
+                A visual tool to create, test, and export complex rules.
+            </p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+
+            <div class="lg:col-span-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 fade-in"
+                style="animation-delay: 100ms;">
+                <div class="p-6 md:p-8">
+                    <header class="mb-6">
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900"
+                            data-translate-key="header_build_logic">
+                            1. Build Your Logic
+                        </h2>
+                        <p class="text-slate-500 mt-1" data-translate-key="subheader_build_logic">
+                            Variables you define on the right will appear here.
+                        </p>
+                    </header>
+                    <div id="rule-builder">
+                        <div class="rule-group" data-level="0">
+                            <div class="group-controls flex flex-wrap items-center gap-3 mb-4">
+                                <select
+                                    class="condition-selector flex-grow bg-slate-100 text-slate-900 font-semibold rounded-lg border-transparent focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 min-w-[200px] p-2">
+                                    <option value="AND" data-translate-key="condition_all"></option>
+                                    <option value="OR" data-translate-key="condition_any"></option>
+                                </select>
+                                <div class="flex-shrink-0 ml-auto space-x-2">
+                                    <button
+                                        class="add-rule bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-200 hover:text-indigo-800 transition-all shadow-sm"></button>
+                                    <button
+                                        class="add-group bg-slate-700 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800 transition-all shadow-sm"></button>
+                                </div>
+                            </div>
+                            <div class="rules-list pl-4 md:pl-6 border-l-4 border-slate-200 rounded-l-md"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 fade-in"
+                    style="animation-delay: 200ms;">
+                    <div class="p-6 md:p-8">
+                        <header class="mb-6">
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900"
+                                data-translate-key="header_define_vars">
+                                2. Define Your Variables
+                            </h2>
+                            <p class="text-slate-500 mt-1" data-translate-key="subheader_define_vars">
+                                Enter data to test your logic.
+                            </p>
+                        </header>
+                        <div id="test-data-builder">
+                            <div id="test-data-list" class="space-y-3"></div>
+                            <button id="add-variable"
+                                class="mt-4 w-full bg-slate-200/70 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-300/80 transition-colors"
+                                data-translate-key="btn_add_variable">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 fade-in"
+                    style="animation-delay: 300ms;">
+                    <div class="p-6 md:p-8">
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4"
+                            data-translate-key="header_evaluate">
+                            3. Evaluate the Result
+                        </h2>
+                        <button id="evaluate-btn"
+                            class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-lg"
+                            data-translate-key="btn_evaluate">
+                        </button>
+                        <div id="result-display" class="mt-6 text-center hidden">
+                            <h3 class="text-slate-600 font-semibold" data-translate-key="evaluation_result_is">
+                            </h3>
+                            <span id="evaluation-result"
+                                class="result-badge mt-2 inline-block px-8 py-2 text-2xl font-bold rounded-full"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="output-container" class="mt-8 bg-slate-900 rounded-xl shadow-lg overflow-hidden hidden fade-in">
+            <div class="flex justify-between items-center p-4 bg-black/20">
+                <h3 class="font-mono text-sm text-cyan-400" data-translate-key="json_generated">
+                </h3>
+                <button id="copy-json"
+                    class="bg-slate-700 text-slate-300 px-3 py-1 rounded-md text-xs font-semibold hover:bg-slate-600"
+                    data-translate-key="btn_copy">
+                </button>
+            </div>
+            <pre id="json-output" class="p-6 text-white text-sm overflow-x-auto"></pre>
+        </div>
+
+        <footer class="text-center mt-12 py-4">
+            <div class="inline-flex space-x-2 rounded-full bg-white/80 shadow-sm border border-slate-200 p-1">
+                <button data-lang="es-MX"
+                    class="lang-btn px-4 py-2 text-sm text-slate-600 rounded-full transition-colors"
+                    data-translate-key="lang_es">
+                </button>
+                <button data-lang="en-US"
+                    class="lang-btn px-4 py-2 text-sm text-slate-600 rounded-full transition-colors"
+                    data-translate-key="lang_en">
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- TRANSLATION DICTIONARY (i18n) ---
+        const translations = {
+            'es-MX': { app_title: "Constructor de Reglas Dinámico", main_header: "Constructor de Lógica de Negocio", main_subheader: "Una herramienta visual para crear, probar y exportar reglas complejas.", header_build_logic: "1. Construye tu Lógica", subheader_build_logic: "Las variables que definas a la derecha aparecerán aquí.", condition_all: "Cumplir TODAS las siguientes", condition_any: "Cumplir CUALQUIERA de las siguientes", btn_add_rule: "Añadir Regla", btn_add_group: "Añadir Grupo", header_define_vars: "2. Define tus Variables", subheader_define_vars: "Ingresa datos para probar tu lógica.", btn_add_variable: "+ Añadir Variable", header_evaluate: "3. Evalúa el Resultado", btn_evaluate: "Evaluar y Generar JSON", evaluation_result_is: "El resultado es:", json_generated: "Estructura JSON Generada", btn_copy: "Copiar", btn_copied: "¡Copiado!", placeholder_variable_name: "nombre_de_variable", placeholder_value: "Valor", variable_placeholder_empty: "Define una variable", result_true: "VÁLIDO", result_false: "INVÁLIDO", operator_eq: "es igual a", operator_neq: "es diferente de", operator_gte: "mayor o igual que", operator_lte: "menor o igual que", operator_gt: "es mayor que", operator_lt: "es menor que", condition_all_short: "TODAS", condition_any_short: "CUALQUIERA", lang_es: "Español", lang_en: "English" },
+            'en-US': { app_title: "Dynamic Rule Builder", main_header: "Business Logic Builder", main_subheader: "A visual tool to create, test, and export complex rules.", header_build_logic: "1. Build Your Logic", subheader_build_logic: "Variables you define on the right will appear here.", condition_all: "Meet ALL of the following", condition_any: "Meet ANY of the following", btn_add_rule: "Add Rule", btn_add_group: "Add Group", header_define_vars: "2. Define Your Variables", subheader_define_vars: "Enter data to test your logic.", btn_add_variable: "+ Add Variable", header_evaluate: "3. Evaluate the Result", btn_evaluate: "Evaluate and Generate JSON", evaluation_result_is: "The result is:", json_generated: "Generated JSON Structure", btn_copy: "Copy", btn_copied: "Copied!", placeholder_variable_name: "variable_name", placeholder_value: "Value", variable_placeholder_empty: "Define a variable", result_true: "VALID", result_false: "INVALID", operator_eq: "is equal to", operator_neq: "is not equal to", operator_gte: "is greater than or equal to", operator_lte: "is less than or equal to", operator_gt: "is greater than", operator_lt: "is less than", condition_all_short: "ALL", condition_any_short: "ANY", lang_es: "Español", lang_en: "English" }
+        };
+        let currentLang = 'en-US';
+
+        // --- HIGH QUALITY SVG ICONS (HEROICONS) ---
+        const ICONS = {
+            trash: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" /></svg>`,
+            plus: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>`,
+            group: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 4.25A2.25 2.25 0 014.25 2h11.5A2.25 2.25 0 0118 4.25v8.5A2.25 2.25 0 0115.75 15H4.25A2.25 2.25 0 012 12.75v-8.5zm1.5 0a.75.75 0 01.75-.75h11.5a.75.75 0 01.75.75v8.5a.75.75 0 01-.75.75H4.25a.75.75 0 01-.75-.75v-8.5z" clip-rule="evenodd" /><path d="M7.655 8.33a.75.75 0 01.337 1.332l-2.25 1.002a.75.75 0 01-.337-1.332l2.25-1.002zM12 10a.75.75 0 00-1.5 0v.5a.75.75 0 001.5 0v-.5z" /><path d="M9 12a.75.75 0 000 1.5h2a.75.75 0 000-1.5H9z" /></svg>`
+        };
+
+        // --- APPLICATION LOGIC ---
+        const ruleBuilder = document.getElementById('rule-builder');
+        const testDataBuilder = document.getElementById('test-data-builder');
+        const evaluateBtn = document.getElementById('evaluate-btn');
+        const jsonOutput = document.getElementById('json-output');
+        const outputContainer = document.getElementById('output-container');
+        const copyJsonBtn = document.getElementById('copy-json');
+        const resultDisplay = document.getElementById('result-display');
+        const evaluationResult = document.getElementById('evaluation-result');
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-translate-key]').forEach(el => {
+                const key = el.getAttribute('data-translate-key');
+                const translation = translations[lang][key];
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = translation;
+                    else el.textContent = translation;
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+            document.querySelectorAll('.operator-selector').forEach(updateOperatorSelectorText);
+            document.querySelectorAll('.condition-selector').forEach(updateConditionSelectorText);
+            updateVariableSelectors();
+            // Update dynamic button text
+            document.querySelectorAll('.add-rule').forEach(el => el.innerHTML = `${ICONS.plus} <span data-translate-key="btn_add_rule">${translations[currentLang].btn_add_rule}</span>`);
+            document.querySelectorAll('.add-group').forEach(el => el.innerHTML = `${ICONS.group} <span data-translate-key="btn_add_group">${translations[currentLang].btn_add_group}</span>`);
+        }
+
+        function updateOperatorSelectorText(selector) {
+            const currentVal = selector.value || "=="; // Default to "==" if no value
+            selector.innerHTML = `
+            <option value="==">${translations[currentLang].operator_eq}</option>
+            <option value="!=">${translations[currentLang].operator_neq}</option>
+            <option value=">=">${translations[currentLang].operator_gte}</option>
+            <option value="<=">${translations[currentLang].operator_lte}</option>
+            <option value=">">${translations[currentLang].operator_gt}</option>
+            <option value="<">${translations[currentLang].operator_lt}</option>`;
+            selector.value = currentVal;
+        }
+
+        function updateConditionSelectorText(selector) {
+            const isShort = !selector.closest('[data-level="0"]');
+            selector.querySelector('[value="AND"]').textContent = isShort ? translations[currentLang].condition_all_short : translations[currentLang].condition_all;
+            selector.querySelector('[value="OR"]').textContent = isShort ? translations[currentLang].condition_any_short : translations[currentLang].condition_any;
+        }
+
+        function addRule(container) {
+            const ruleRow = document.createElement('div');
+            ruleRow.className = 'rule-row bg-white p-3 rounded-lg border border-slate-200 flex flex-wrap items-center gap-x-3 gap-y-2 mt-3 fade-in';
+            ruleRow.innerHTML = `
+            <select class="variable-selector flex-grow bg-white border border-slate-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 min-w-[150px] p-2"></select>
+            <select class="operator-selector flex-grow bg-white border border-slate-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 min-w-[150px] p-2">
+                <option value="==">${translations[currentLang].operator_eq}</option>
+                <option value="!=">${translations[currentLang].operator_neq}</option>
+                <option value=">=">${translations[currentLang].operator_gte}</option>
+                <option value="<=">${translations[currentLang].operator_lte}</option>
+                <option value=">">${translations[currentLang].operator_gt}</option>
+                <option value="<">${translations[currentLang].operator_lt}</option>
+            </select>
+            <input type="text" class="value-input flex-grow bg-white border border-slate-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 min-w-[150px] p-2" placeholder="${translations[currentLang].placeholder_value}">
+            <button class="delete-btn text-slate-400 hover:text-red-600 transition-colors p-1 ml-auto">${ICONS.trash}</button>`;
+            container.appendChild(ruleRow);
+            updateVariableSelectors();
+        }
+
+        function addGroup(container) {
+            const group = document.createElement('div');
+            group.className = 'rule-group bg-slate-100/80 border-slate-200 rounded-lg p-4 mt-3 fade-in';
+            group.innerHTML = `
+            <div class="group-controls flex flex-wrap items-center gap-3 mb-4">
+                <select class="condition-selector flex-grow bg-slate-200 text-slate-900 font-semibold rounded-lg border-transparent focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 min-w-[200px] p-2">
+                    <option value="AND"></option>
+                    <option value="OR"></option>
+                </select>
+                <div class="flex-shrink-0 ml-auto space-x-2">
+                    <button class="add-rule bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-200 transition-all">${ICONS.plus} <span data-translate-key="btn_add_rule">${translations[currentLang].btn_add_rule}</span></button>
+                    <button class="add-group bg-slate-700 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800 transition-all">${ICONS.group} <span data-translate-key="btn_add_group">${translations[currentLang].btn_add_group}</span></button>
+                    <button class="delete-btn text-slate-400 hover:text-red-600 transition-colors p-1">${ICONS.trash}</button>
+                </div>
+            </div>
+            <div class="rules-list pl-4 md:pl-6 border-l-4 border-slate-300 rounded-l-md"></div>`;
+            container.appendChild(group);
+            updateConditionSelectorText(group.querySelector('.condition-selector'));
+        }
+
+        function addVariableRow(key = '', value = '') {
+            const container = document.getElementById('test-data-list');
+            const row = document.createElement('div');
+            row.className = 'variable-row flex flex-wrap items-center gap-x-3 gap-y-2 fade-in';
+            row.innerHTML = `
+            <input type="text" class="variable-key-input flex-grow border border-slate-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 min-w-[150px] p-2" placeholder="${translations[currentLang].placeholder_variable_name}" value="${key}">
+            <span class="text-slate-500 font-semibold flex-shrink-0">:</span>
+            <input type="text" class="variable-value-input flex-grow border border-slate-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 min-w-[150px] p-2" placeholder="${translations[currentLang].placeholder_value}" value="${value}">
+            <button class="delete-btn text-slate-400 hover:text-red-600 transition-colors p-1 ml-auto flex-shrink-0">${ICONS.trash}</button>`;
+            container.appendChild(row);
+            updateVariableSelectors();
+        }
+
+        const parseValue = (value) => {
+            if (value.toLowerCase() === 'true') return true;
+            if (value.toLowerCase() === 'false') return false;
+            if (!isNaN(value) && value.trim() !== '') return parseFloat(value);
+            return value;
+        };
+
+        const updateVariableSelectors = () => {
+            const vars = Array.from(document.querySelectorAll('#test-data-list .variable-key-input'))
+                .map(input => input.value.trim())
+                .filter(Boolean);
+
+            document.querySelectorAll('.variable-selector').forEach(selector => {
+                const prev = selector.value;
+                selector.innerHTML = '';
+
+                if (vars.length === 0) {
+                    selector.innerHTML = `<option value="">${translations[currentLang].variable_placeholder_empty}</option>`;
+                } else {
+                    vars.forEach(v => selector.innerHTML += `<option value="${v}">${v}</option>`);
+                }
+
+                if (vars.includes(prev)) selector.value = prev;
+            });
+        };
+
+        const parseGroup = (groupElement) => {
+            const output = {
+                condition: groupElement.querySelector('.condition-selector').value,
+                rules: []
+            };
+
+            for (const child of groupElement.querySelector('.rules-list').children) {
+                if (child.classList.contains('rule-row')) {
+                    output.rules.push({
+                        variable: child.querySelector('.variable-selector').value,
+                        operator: child.querySelector('.operator-selector').value,
+                        value: parseValue(child.querySelector('.value-input').value)
+                    });
+                } else if (child.classList.contains('rule-group')) {
+                    output.rules.push(parseGroup(child));
+                }
+            }
+
+            return output;
+        };
+
+        const parseTestData = () => {
+            const data = {};
+            document.querySelectorAll('#test-data-list .variable-row').forEach(row => {
+                const key = row.querySelector('.variable-key-input').value;
+                const value = row.querySelector('.variable-value-input').value;
+                if (key) data[key] = parseValue(value);
+            });
+            return data;
+        };
+
+        const evaluarRegla = (regla, datos) => {
+            const op = regla.condition;
+
+            for (const sub of regla.rules) {
+                let res;
+
+                if (sub.rules) {
+                    res = evaluarRegla(sub, datos);
+                } else {
+                    const dato = datos[sub.variable], cond = sub.value;
+                    switch (sub.operator) {
+                        case '==': res = (dato == cond); break;
+                        case '!=': res = (dato != cond); break;
+                        case '>': res = (dato > cond); break;
+                        case '>=': res = (dato >= cond); break;
+                        case '<': res = (dato < cond); break;
+                        case '<=': res = (dato <= cond); break;
+                        default: res = false;
+                    }
+                }
+
+                if (op === 'AND' && !res) return false;
+                if (op === 'OR' && res) return true;
+            }
+
+            return op === 'AND';
+        };
+
+        const handleEvaluation = () => {
+            const rules = parseGroup(document.querySelector('#rule-builder .rule-group'));
+            const data = parseTestData();
+            const result = evaluarRegla(rules, data);
+
+            jsonOutput.textContent = JSON.stringify(rules, null, 2);
+            outputContainer.classList.remove('hidden');
+
+            evaluationResult.textContent = result ? translations[currentLang].result_true : translations[currentLang].result_false;
+            evaluationResult.className = `result-badge mt-2 inline-block px-8 py-2 text-2xl font-bold rounded-full ${result ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+
+            resultDisplay.classList.remove('hidden');
+        };
+
+        const handleCopyJson = () => {
+            navigator.clipboard.writeText(jsonOutput.textContent).then(() => {
+                copyJsonBtn.textContent = translations[currentLang].btn_copied;
+                setTimeout(() => {
+                    copyJsonBtn.textContent = translations[currentLang].btn_copy;
+                }, 2000);
+            });
+        };
+
+        const handleRuleBuilderClick = (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const group = btn.closest('.rule-group');
+            const list = group.querySelector('.rules-list');
+
+            if (btn.classList.contains('add-rule')) addRule(list);
+            if (btn.classList.contains('add-group')) addGroup(list);
+            if (btn.classList.contains('delete-btn')) btn.closest('.rule-row,.rule-group').remove();
+        };
+
+        const handleTestDataClick = (e) => {
+            const btn = e.target.closest('button');
+
+            if (btn && btn.classList.contains('delete-btn')) {
+                btn.closest('.variable-row').remove();
+                updateVariableSelectors();
+            }
+
+            if (btn && btn.id === 'add-variable') addVariableRow();
+        };
+
+        // --- INITIALIZATION ---
+        function init() {
+            const userLang = navigator.language || navigator.userLanguage;
+            const initialLang = userLang.startsWith('es') ? 'es-MX' : 'en-US';
+            setLanguage(initialLang);
+            addVariableRow('country_code', 'US');
+            addVariableRow('user_age', 25);
+            addVariableRow('is_active', true);
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+        ruleBuilder.addEventListener('click', handleRuleBuilderClick);
+        testDataBuilder.addEventListener('click', handleTestDataClick);
+        testDataBuilder.addEventListener('input', e => {
+            if (e.target.classList.contains('variable-key-input')) {
+                updateVariableSelectors();
+            }
+        });
+        evaluateBtn.addEventListener('click', handleEvaluation);
+        copyJsonBtn.addEventListener('click', handleCopyJson);
+
+        init();
+    </script>
+</body>
+
+</html>
